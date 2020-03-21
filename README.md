@@ -10,3 +10,5 @@ Currently just an idea.
 
 ## TODO:
  * Pretty much everything
+ * I expect to be able to render very large tables using this method. I might look into using Cython to speed up the string concatonation. This is mainly because I want to learn Cython.
+ 
