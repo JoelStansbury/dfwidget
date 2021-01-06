@@ -1,14 +1,37 @@
 # dfwidget
 IPython widget for displaying pandas DataFrames (Jupyterlab)
 
-Currently just an idea.
+# Requirements
+* ipywidgets
+* nodejs
+* ipyevents
+* pandas
 
-# Plan
-* Table contents (cells) are in a single `HTML` element
-* Use ipyevents to determine the location of the cursor within the widget
-* Header is a row of `ipyw.Button()`s to sort the columns
+Prerequisites
+```bash
+pip install jupyterlab
+pip install ipywidgets
+pip install nodejs
+pip install ipyevents
+jupyter labextension install @jupyter-widgets/jupyterlab-manager
+jupyter labextension install @jupyter-widgets/jupyterlab-manager ipyevents
+pip install pandas
+```
 
-## TODO:
- * Pretty much everything
- * I expect to be able to render very large tables using this method. I might look into using Cython to speed up the string concatonation. This is mainly because I want to learn Cython.
+Installing `dfwidget`. 
+From the package root...
+```
+pip install .
+```
+
+Alternatively, you could just copy and paste `src/dfwidget/main.py` wherever you want it so long as you have `ipyevents` working.
+
+
+
+# Usage
+<img src="examples/demo.gif" alt="alt text" width=200 height=300>
+
+Currently the column headers will only sort the dataframe in ascending order.
+The button above the index column resets the order and returns to the top.
+
  
