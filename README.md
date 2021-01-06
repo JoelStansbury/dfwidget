@@ -39,7 +39,7 @@ Currently the column headers will only sort the dataframe in ascending order.
 
 The button above the index column resets the order and returns to the top.
 
-<img src="examples/headers.png" alt="alt text" width=200 height=300>
+<img src="examples/headers.png" alt="alt text">
 
 The auto-spacing function seems to be ok (no extensive testing).
 
