@@ -1,9 +1,8 @@
-from ipywidgets import HTML, Button, HBox, VBox
-from ipyevents import Event
 from collections import deque
+
+from ipyevents import Event
+from ipywidgets import HTML, Button, HBox, VBox
 from traitlets import Int, observe, link
-
-
 
 
 class _Cell(HTML):
