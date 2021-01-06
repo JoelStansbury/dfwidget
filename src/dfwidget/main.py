@@ -1,7 +1,6 @@
 from ipywidgets import HTML, Button, HBox, VBox
 from ipyevents import Event
 from collections import deque
-from time import time
 from traitlets import Int, observe, link
 
 CSS = """
@@ -80,8 +79,6 @@ class _Row(HBox):
 
         d  = Event(source=self, watched_events=['click'])
         d.on_dom_event(self.on_click)
-        # d  = Event(source=self, watched_events=['mouseleave'])
-        # d.on_dom_event(self.mouse_out)
 
     def update(self, data, style=None):
         self.data = data
@@ -139,8 +136,7 @@ class _Content(VBox):
         for row in rows:
             row.observe(self.set_val, "value")
 
-        self.rows = deque(rows) ### DEQUE ###
-        # self.rows = rows ### NO DEQUE ###
+        self.rows = deque(rows)
 
         self.children = list(self.rows)[0:self.to_show]
         d  = Event(source=self, watched_events=['wheel', "mousemove", "mouseleave"])
@@ -177,21 +173,6 @@ class _Content(VBox):
             self.rows[self.row_num].remove_class("row_hover")
         
     def scroll(self, event=None):
-
-        ### NO DEQUE ###
-        # if event["deltaY"] > 0: # down
-        #     if self.idx+self.to_show < len(self.records):
-        #         self.idx += 1
-        # else: # up
-        #     if self.idx >0:
-        #         self.idx -= 1
-        
-        # styles = ["row_even","row_odd"]
-        # for i in range(self.num_rows):
-        #     n = self.idx+i
-        #     self.rows[i].update(self.records[n], style=styles[n%2])
-
-        ### DEQUE ###
         if "deltaY" in event:
             self.un_hover()
             self.row_num = -1
@@ -219,15 +200,9 @@ class _Content(VBox):
 class DataFrame(VBox):
     """
     num_rows: (int) number of rows to be displayed
-    widths: dict(
-                str(column_name): 
-                int(num_characters),
-                ...
-            )
     """
     value = Int().tag(sync=True)
     def __init__(self, df, **kwargs):
-        # .get() any kwargs needed by self, and ignored by super
         self.num_rows = kwargs.get("num_rows", 10)
         widths = self.auto_width(df,kwargs.get("widths", None))
 
@@ -247,11 +222,10 @@ class DataFrame(VBox):
         """
 
         cols = list(df.columns)
-        # df.columns = cols
-
         ppc = 7
         spacing = 2
         widths = {}
+
         for c in cols:
             c_width = len(str(c))
             d_width = max([len(str(x)) for x in df[c].values[:self.num_rows]])
@@ -259,9 +233,8 @@ class DataFrame(VBox):
 
         widths["Index"] = len(str(len(df))) + spacing 
         cols = ["Index"] + cols
-
-        # if override:
         total = sum(list(widths.values()))
         self.width = f"{total*ppc}px"
+
         return [f"{int(100*widths[k]/total)}%" for k in cols]
     
