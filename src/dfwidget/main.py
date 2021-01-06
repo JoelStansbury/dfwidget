@@ -3,39 +3,7 @@ from ipyevents import Event
 from collections import deque
 from traitlets import Int, observe, link
 
-CSS = """
-    <style>
-    .dfwidget_main {
-        border:1px solid black;
-    }
-    .row_even {
-        background-color:white;
-    }
-    .row_odd {
-        background-color:#f5f5f5;
-    }
-    .index {
-        font-weight: bold;
-        text-align: end;
-    }
-    .cell {
-        padding: 3px 2px 3px 2px;
-        text-align: end;
-        line-height: inherit;
-        height: inherit;
-    }
-    .header_btn {
-        font-weight: bold;
-        background-color:white;
-    }
-    .row_hover {
-        background-color: #e1f5fe;
-    }
-    .content {
-        border-top: 1px solid #bdbdbd;
-    }
-    </style>
-    """
+
 
 
 class _Cell(HTML):
@@ -196,12 +164,46 @@ class _Content(VBox):
 class DataFrame(VBox):
     """
     num_rows: (int) number of rows to be displayed
+        default: 10
+    cell_padding: (str) Padding to be applied around text
+        default: "3px 2px 3px 2px"
     """
     value = Int().tag(sync=True)
-    def __init__(self, df, **kwargs):
+    def __init__(self, df, num_rows=10, cell_padding="3px 2px 3px 2px", **kwargs):
         super().__init__(**kwargs)
-
-        num_rows = kwargs.get("num_rows", 10)
+        CSS = f"""
+            <style>
+            .dfwidget_main {{
+                border:1px solid black;
+            }}
+            .row_even {{
+                background-color:white;
+            }}
+            .row_odd {{
+                background-color:#f5f5f5;
+            }}
+            .index {{
+                font-weight: bold;
+                text-align: end;
+            }}
+            .cell {{
+                padding: {cell_padding};
+                text-align: end;
+                line-height: inherit;
+                height: inherit;
+            }}
+            .header_btn {{
+                font-weight: bold;
+                background-color:white;
+            }}
+            .row_hover {{
+                background-color: #e1f5fe;
+            }}
+            .content {{
+                border-top: 1px solid #bdbdbd;
+            }}
+            </style>
+            """
         width, widths = self.auto_width(df, num_rows)
 
         if not self.layout.width:
@@ -225,7 +227,7 @@ class DataFrame(VBox):
         widths = {}
 
         for c in cols:
-            c_width = len(str(c)) + 1
+            c_width = len(str(c))
             d_width = max([len(str(x)) for x in df[c].values[:num_rows]])
             widths[c] = max(c_width, d_width) + spacing
 
