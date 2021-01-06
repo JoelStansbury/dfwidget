@@ -1,1 +1,1 @@
-from .main_widget import DataFrame
+from .main import DataFrame
