@@ -1,6 +1,21 @@
 # dfwidget
 IPython widget for displaying pandas DataFrames (Jupyterlab).
 
+
+# Features
+
+* Scrolling works as you would expect. 
+<img src="examples/demo.gif" alt="alt text" width=200 height=300>
+
+* Clickable rows set the trait `value` to the index of the row selected. 
+* Clickable headers to sort the data (only ascending at-the-moment). 
+* Reset button above the `index` column.
+* The auto-spacing function seems to be ok (no extensive testing). 
+<img src="examples/headers.png" alt="alt text">
+
+* Looks almost exactly like your typical `Pandas` DataFrame.
+
+
 # Requirements
 * ipywidgets
 * nodejs
@@ -26,22 +41,6 @@ pip install .
 
 Alternatively, you could just copy and paste `src/dfwidget/main.py` wherever you want it so long as you have `ipyevents` working.
 
-
-
-# Features
-<img src="examples/demo.gif" alt="alt text" width=200 height=300>
-
-Scrolling works as you would expect. 
-
-Clicking a row sets the `DataFrame` widget's trait `value` to the index of the row selected.
-
-Currently the column headers will only sort the dataframe in ascending order.
-
-The button above the index column resets the order and returns to the top.
-
-<img src="examples/headers.png" alt="alt text">
-
-The auto-spacing function seems to be ok (no extensive testing).
 
 
 
