@@ -28,7 +28,7 @@ Alternatively, you could just copy and paste `src/dfwidget/main.py` wherever you
 
 
 
-# Demo
+# Features
 <img src="examples/demo.gif" alt="alt text" width=200 height=300>
 
 Scrolling works as you would expect. 
@@ -39,6 +39,9 @@ Currently the column headers will only sort the dataframe in ascending order.
 
 The button above the index column resets the order and returns to the top.
 
+<img src="examples/headers.png" alt="alt text" width=200 height=300>
+
+The auto-spacing function seems to be ok (no extensive testing).
 
 
 
