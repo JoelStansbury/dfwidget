@@ -192,7 +192,7 @@ class _Content(VBox):
                         aux = self.rows.pop()
                         aux.update(self.records[self.idx])
                         self.rows.appendleft(aux)
-            self.children = [self.rows[i] for i in range(self.num_rows)]
+            self.children = [self.rows[i] for i in range(self.to_show)]
         else:
             self.on_hover(event)
 
