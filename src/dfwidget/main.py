@@ -227,7 +227,7 @@ class DataFrame(VBox):
         widths = {}
 
         for c in cols:
-            c_width = len(str(c))
+            c_width = len(str(c)) + 2
             d_width = max([len(str(x)) for x in df[c].values[:self.num_rows]])
             widths[c] = max(c_width, d_width) + spacing
 
