@@ -1,5 +1,5 @@
 # dfwidget
-IPython widget for displaying pandas DataFrames (Jupyterlab).
+IPython widget for displaying pandas DataFrames.
 
 
 # Features
