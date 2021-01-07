@@ -163,7 +163,6 @@ class _Content(VBox):
     def scroll(self, deltaY):
         N = len(self.records)
         nr = self.num_rows
-        idx = self.idx
         
         if self.wrap_around:
             n = deltaY//100
