@@ -107,7 +107,7 @@ class _Content(VBox):
     value = Int(-1).tag(sync=True)
     focus_idx = Int(-1).tag(sync=True)
 
-    def __init__(self, df, to_show, widths, **kwargs):
+    def __init__(self, df, to_show, widths, wrap_around, **kwargs):
         super().__init__(**kwargs)
         self.add_class("content")
         d  = Event(source=self, watched_events=['wheel', "mousemove", "mouseleave"])
@@ -116,6 +116,7 @@ class _Content(VBox):
         self.to_show = to_show
         self.num_rows = min(len(df), to_show if to_show%2==0 else to_show+1)
         self.idx = 0
+        self.wrap_around = wrap_around
         self.df = df
         self.records = df.to_records()
         def row_on_click(event):
@@ -159,17 +160,22 @@ class _Content(VBox):
         i = int(abs(y//row_height))
         self.focus_idx = min(self.to_show-1, i) # Calls self.focus()
 
-    def scroll(self, deltaY, wrap_around=False):
+    def scroll(self, deltaY):
         N = len(self.records)
         nr = self.num_rows
-        n = deltaY//100
-
-        self.focus_idx = -1 # Calls self.focus()
-        self.idx += n
-        if self.idx >= (N-nr):
-            self.idx -= N
-        if self.idx <= (-N):
-            self.idx += N
+        idx = self.idx
+        
+        if self.wrap_around:
+            n = deltaY//100
+            self.focus_idx = -1 # Calls self.focus()
+            self.idx += n
+            if self.idx >= (N-nr):
+                self.idx -= N
+            if self.idx <= (-N+1):
+                self.idx += N
+        else:
+            n = max(min((N-nr)-idx, deltaY//100), -self.idx)
+            self.idx += n
         
         self.rows.rotate(-n)
         if n > 0:
@@ -198,7 +204,7 @@ class DataFrame(VBox):
         default: 10
     """
     value = Int().tag(sync=True)
-    def __init__(self, df, num_rows=10, **kwargs):
+    def __init__(self, df, num_rows=10, wrap_around=False, **kwargs):
         super().__init__(**kwargs)
 
         width, widths = self.auto_width(df, num_rows)
@@ -209,7 +215,7 @@ class DataFrame(VBox):
         
         self.css = HTML(CSS)
         self.add_class("main")
-        self.content = _Content(df, num_rows, widths)
+        self.content = _Content(df, num_rows, widths, wrap_around)
         link((self.content, "value"), (self, "value"))
         self.header = _Header(df, widths, self.content)
         self.children = [self.header, self.content, self.css]
