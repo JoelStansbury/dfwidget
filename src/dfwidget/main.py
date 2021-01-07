@@ -137,19 +137,16 @@ class _Content(VBox):
             for i in range(int(deltaY/100)):
                 if self.idx+self.to_show < len(self.records):
                     self.idx += 1
-                    n = self.idx + self.num_rows  - 1
-                    aux = self.rows.popleft()
-                    if n < len(self.records):
-                        aux.update(self.records[n])
-                    self.rows.append(aux)
+                    self.rows.rotate(-1)
+                    self.children = [self.rows[i] for i in range(self.to_show)]
+                    self.rows[-1].update(self.records[self.idx + self.num_rows  - 1])
         else: # up
             for i in range(int(-deltaY/100)):
                 if self.idx >0:
                     self.idx -= 1
-                    aux = self.rows.pop()
-                    aux.update(self.records[self.idx])
-                    self.rows.appendleft(aux)
-        self.children = [self.rows[i] for i in range(self.to_show)]
+                    self.rows.rotate(1)
+                    self.rows[0].update(self.records[self.idx])
+                    self.children = [self.rows[i] for i in range(self.to_show)]
     
     def event_handler(self, event):
         if "deltaY" in event:
