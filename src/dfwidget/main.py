@@ -173,7 +173,7 @@ class _Content(VBox):
             if self.idx <= (-N+1):
                 self.idx += N
         else:
-            n = max(min((N-nr)-idx, deltaY//100), -self.idx)
+            n = max(min((N-nr)-self.idx, deltaY//100), -self.idx)
             self.idx += n
         
         self.rows.rotate(-n)
