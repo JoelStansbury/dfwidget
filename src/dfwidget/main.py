@@ -3,7 +3,36 @@ from collections import deque
 from ipyevents import Event
 from ipywidgets import HTML, Button, HBox, VBox
 from traitlets import Int, observe, link
-
+CSS = """
+    <style>
+    .main {
+    }
+    .content {
+        border-top: 1px solid #bdbdbd;
+    }
+    .row_even {
+        background-color:white;
+    }
+    .row_odd {
+        background-color:#f5f5f5;
+    }
+    .row_hover {
+        background-color: #e1f5fe;
+    }
+    .index {
+        font-weight: bold;
+    }
+    .cell{
+        padding: 0 2px 0 0;
+        margin: 0;
+        text-align: end;
+    }
+    .header_btn {
+        font-weight: bold;
+        background-color: inherit;
+    }
+    </style>
+    """
 
 class _Cell(HTML):
     def __init__(self, data, width):
@@ -59,7 +88,7 @@ class _Header(HBox):
         self.content_widget = content_widget
 
         def sort_col(btn):
-            self.df.sort_values(by=btn.value, inplace = True)
+            self.df.sort_values(by=btn.value, inplace = True, kind="mergesort")
             self.content_widget.update()
         
         def sort_idx(btn):
@@ -84,13 +113,14 @@ class _Content(VBox):
         d  = Event(source=self, watched_events=['wheel', "mousemove", "mouseleave"])
         d.on_dom_event(self.event_handler)
 
-
+        self.id = "Content"
         self.to_show = to_show
         self.num_rows = min(len(df), to_show if to_show%2==0 else to_show+1)
         self.idx = 0
         self.df = df
         self.records = df.to_records()
         def row_on_click(event):
+            print(event)
             if event["new"] != -1:
                 self.value = event["new"]
         self.rows = deque(
@@ -128,25 +158,25 @@ class _Content(VBox):
         h = event["boundingRectHeight"]
         row_height = h//self.to_show
         y = event["relativeY"]
-        i = abs(y//row_height)
+        i = int(abs(y//row_height))
         self.focus_idx = min(self.to_show-1, i) # Calls self.focus()
 
-    def scroll(self, deltaY):
+    def scroll(self, deltaY, wrap_around=False):
         self.focus_idx = -1 # Calls self.focus()
-        if deltaY > 0: # down
-            for i in range(int(deltaY/100)):
-                if self.idx+self.to_show < len(self.records):
-                    self.idx += 1
-                    self.rows.rotate(-1)
-                    self.children = [self.rows[i] for i in range(self.to_show)]
-                    self.rows[-1].update(self.records[self.idx + self.num_rows  - 1])
-        else: # up
-            for i in range(int(-deltaY/100)):
-                if self.idx >0:
-                    self.idx -= 1
-                    self.rows.rotate(1)
-                    self.rows[0].update(self.records[self.idx])
-                    self.children = [self.rows[i] for i in range(self.to_show)]
+        n = deltaY//100
+        self.idx += n
+        self.rows.rotate(-n)
+
+        if n > 0:
+            i = self.num_rows-n
+            j = self.num_rows
+        else:
+            i = 0
+            j = abs(n)
+        for k in range(i,j):
+            self.rows[k].update(self.records[self.idx+k])
+
+        self.children = [self.rows[i] for i in range(self.to_show)]
     
     def event_handler(self, event):
         if "deltaY" in event:
@@ -167,39 +197,8 @@ class DataFrame(VBox):
     value = Int().tag(sync=True)
     def __init__(self, df, num_rows=10, cell_padding="3px 2px 3px 2px", **kwargs):
         super().__init__(**kwargs)
-        CSS = f"""
-            <style>
-            .dfwidget_main {{
-                border:1px solid black;
-            }}
-            .row_even {{
-                background-color:white;
-            }}
-            .row_odd {{
-                background-color:#f5f5f5;
-            }}
-            .index {{
-                font-weight: bold;
-                text-align: end;
-            }}
-            .cell {{
-                padding: {cell_padding};
-                text-align: end;
-                line-height: inherit;
-                height: inherit;
-            }}
-            .header_btn {{
-                font-weight: bold;
-                background-color:white;
-            }}
-            .row_hover {{
-                background-color: #e1f5fe;
-            }}
-            .content {{
-                border-top: 1px solid #bdbdbd;
-            }}
-            </style>
-            """
+
+        self.add_class("main")
         width, widths = self.auto_width(df, num_rows)
 
         if not self.layout.width:
@@ -227,7 +226,7 @@ class DataFrame(VBox):
             d_width = max([len(str(x)) for x in df[c].values[:num_rows]])
             widths[c] = max(c_width, d_width) + spacing
 
-        widths["Index"] = len(str(len(df))) + spacing 
+        widths["Index"] = len(str(len(df))) 
         cols = ["Index"] + cols
         total = sum(list(widths.values()))
 
