@@ -120,7 +120,6 @@ class _Content(VBox):
         self.df = df
         self.records = df.to_records()
         def row_on_click(event):
-            print(event)
             if event["new"] != -1:
                 self.value = event["new"]
         self.rows = deque(
@@ -162,20 +161,27 @@ class _Content(VBox):
         self.focus_idx = min(self.to_show-1, i) # Calls self.focus()
 
     def scroll(self, deltaY, wrap_around=False):
-        self.focus_idx = -1 # Calls self.focus()
+        N = len(self.records)
+        nr = self.num_rows
         n = deltaY//100
-        self.idx += n
-        self.rows.rotate(-n)
 
+        self.focus_idx = -1 # Calls self.focus()
+        self.idx += n
+        if self.idx >= (N-nr):
+            self.idx -= N
+        if self.idx <= (-N):
+            self.idx += N
+        
+        self.rows.rotate(-n)
         if n > 0:
-            i = self.num_rows-n
-            j = self.num_rows
+            i = nr-n
+            j = nr
         else:
             i = 0
-            j = abs(n)
+            j = min(abs(n),nr)
         for k in range(i,j):
-            self.rows[k].update(self.records[self.idx+k])
-
+            x = min(self.idx+k, N-1)
+            self.rows[k].update(self.records[x])
         self.children = [self.rows[i] for i in range(self.to_show)]
     
     def event_handler(self, event):
