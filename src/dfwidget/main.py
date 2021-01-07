@@ -25,11 +25,11 @@ CSS = """
     .cell{
         padding: 0 2px 0 0;
         margin: 0;
-        text-align: end;
     }
     .header_btn {
         font-weight: bold;
         background-color: inherit;
+        text-align: end;
     }
     </style>
     """
@@ -113,7 +113,6 @@ class _Content(VBox):
         d  = Event(source=self, watched_events=['wheel', "mousemove", "mouseleave"])
         d.on_dom_event(self.event_handler)
 
-        self.id = "Content"
         self.to_show = to_show
         self.num_rows = min(len(df), to_show if to_show%2==0 else to_show+1)
         self.idx = 0
@@ -197,20 +196,19 @@ class DataFrame(VBox):
     """
     num_rows: (int) number of rows to be displayed
         default: 10
-    cell_padding: (str) Padding to be applied around text
-        default: "3px 2px 3px 2px"
     """
     value = Int().tag(sync=True)
-    def __init__(self, df, num_rows=10, cell_padding="3px 2px 3px 2px", **kwargs):
+    def __init__(self, df, num_rows=10, **kwargs):
         super().__init__(**kwargs)
 
-        self.add_class("main")
         width, widths = self.auto_width(df, num_rows)
 
         if not self.layout.width:
             self.layout.width = width
 
+        
         self.css = HTML(CSS)
+        self.add_class("main")
         self.content = _Content(df, num_rows, widths)
         link((self.content, "value"), (self, "value"))
         self.header = _Header(df, widths, self.content)
