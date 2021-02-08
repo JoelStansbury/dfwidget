@@ -1,4 +1,5 @@
 from collections import deque
+from math import ceil
 
 from ipyevents import Event
 from ipywidgets import HTML, Button, HBox, VBox
@@ -26,6 +27,7 @@ CSS = """
         padding: 0 2px 0 0;
         margin: 0;
         text-align: end;
+        overflow: hidden !important;
     }
     .header_btn {
         font-weight: bold;
@@ -163,10 +165,10 @@ class _Content(VBox):
     def scroll(self, deltaY):
         N = len(self.records)
         nr = self.num_rows
+        self.focus_idx = -1 # Calls self.focus()
         
         if self.wrap_around:
             n = deltaY//100
-            self.focus_idx = -1 # Calls self.focus()
             self.idx += n
             if self.idx >= (N-nr):
                 self.idx -= N
@@ -227,7 +229,7 @@ class DataFrame(VBox):
 
         cols = list(df.columns)
         ppc = 8 # Pixels per Character
-        spacing = 1 # Padding (# characters)
+        spacing = 0 # Padding (# characters)
         widths = {}
 
         for c in cols:
@@ -235,9 +237,12 @@ class DataFrame(VBox):
             d_width = max([len(str(x)) for x in df[c].values[:num_rows]])
             widths[c] = max(c_width, d_width) + spacing
 
-        widths["Index"] = len(str(len(df))) 
+        # Make space for index values
+        widths["Index"] = len(str(len(df)))+spacing
+
+        # Add index to the list of columns
         cols = ["Index"] + cols
         total = sum(list(widths.values()))
 
-        return f"{total*ppc}px", [f"{int(100*widths[k]/total)}%" for k in cols]
+        return f"{total*ppc}px", [f"{ceil(100*widths[k]/total)}%" for k in cols]
     
