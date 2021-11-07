@@ -168,14 +168,14 @@ class _Content(VBox):
         self.focus_idx = -1 # Calls self.focus()
         
         if self.wrap_around:
-            n = deltaY//100
+            n = deltaY
             self.idx += n
             if self.idx >= (N-nr):
                 self.idx -= N
             if self.idx <= (-N+1):
                 self.idx += N
         else:
-            n = max(min((N-nr)-self.idx, deltaY//100), -self.idx)
+            n = max(min((N-nr)-self.idx, deltaY), -self.idx)
             self.idx += n
         
         self.rows.rotate(-n)
@@ -191,8 +191,10 @@ class _Content(VBox):
         self.children = [self.rows[i] for i in range(self.to_show)]
     
     def event_handler(self, event):
+        # print(event)
         if "deltaY" in event:
-            self.scroll(event["deltaY"])
+            to_scroll = 1 if event["deltaY"] > 0 else -1
+            self.scroll(to_scroll)
         elif "type" in event and event["type"] == "mouseleave":
             self.focus_idx = -1 # Calls self.focus()
         else:
@@ -229,7 +231,7 @@ class DataFrame(VBox):
 
         cols = list(df.columns)
         ppc = 8 # Pixels per Character
-        spacing = 0 # Padding (# characters)
+        spacing = 2 # Padding (# characters)
         widths = {}
 
         for c in cols:
